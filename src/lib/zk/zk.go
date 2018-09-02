@@ -5,7 +5,7 @@ import (
 	"time"
 	"fmt"
 	"errors"
-	. "log"
+	. "loger"
 )
 
 type ZkClient struct {
@@ -25,7 +25,12 @@ func NewZkClient(hosts []string, timeout time.Duration) (*ZkClient) {
 	client := &ZkClient{}
 	client.setTimeout(timeout)
 	client.setZkHost(hosts)
-	client.conn = nil
+	var err error
+	client.conn, err = client.getZkConn()
+	if err != nil {
+		Error("getZkConn failed, " + err.Error())
+		return nil
+	}
 	return client
 }
 
@@ -39,6 +44,9 @@ func (this *ZkClient) getZkConn() (*samuelzk.Conn, error) {
 		fmt.Println(err)
 		return nil, errors.New("can not connect to zk server")
 	}
+	this.ChildrenW()
 	this.conn  = newConn
 	return newConn, nil
 }
+
+//func (this *ZkClient)
