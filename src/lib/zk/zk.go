@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"errors"
 	. "loger"
+	"util"
 )
-
+const (
+	ZK_TIMEOUT	=	15
+)
 type ZkClient struct {
 	samuelzk.Conn
 	zkHost		[]string
@@ -22,7 +25,19 @@ func (this *ZkClient) setTimeout(duration time.Duration) () {
 }
 
 func NewZkClient(hosts []string, timeout time.Duration) (*ZkClient) {
+	if len(hosts) == 0 {
+		return nil
+	}
+	if timeout == 0 {
+		timeout = ZK_TIMEOUT
+	}
 	client := &ZkClient{}
+	for _, host := range hosts {
+		if util.ValidIP4Address(host) == false && util.ValidServerAddress(host) == false {
+			Error("parameter hosts illegal")
+			return nil
+		}
+	}
 	client.setTimeout(timeout)
 	client.setZkHost(hosts)
 	var err error
@@ -44,7 +59,6 @@ func (this *ZkClient) getZkConn() (*samuelzk.Conn, error) {
 		fmt.Println(err)
 		return nil, errors.New("can not connect to zk server")
 	}
-	this.ChildrenW()
 	this.conn  = newConn
 	return newConn, nil
 }
