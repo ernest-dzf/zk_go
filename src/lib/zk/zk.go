@@ -1,7 +1,7 @@
 package zk
 
 import (
-	samuelzk "github.com/samuel/go-zookeeper/zk"
+	samuelzk "github.com/go-zookeeper/zk"
 	"time"
 	"fmt"
 	"errors"
